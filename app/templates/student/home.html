@@ -1,0 +1,81 @@
+{% extends "student/_base.html" %}
+{% import "macros.html" as ui with context %}
+{% block content %}
+<div class="reveal">
+  <section class="card hero">
+    <div class="greet">
+      <div class="grow">
+        <div class="muted small">{{ 'Good morning' if now.hour < 12 else ('Good afternoon' if now.hour < 17 else 'Good evening') }} ☀️</div>
+        <h1>{{ user.name.split()[0] }}</h1>
+        <div class="muted small">{{ latest.exam.name ~ ' result' if latest else 'No results yet' }}</div>
+      </div>
+      {% if latest %}
+      <div class="ring" style="--p:{{ latest.percent }}" aria-label="Latest exam {{ latest.percent|num }} percent">
+        <svg viewBox="0 0 100 100"><circle class="bg" cx="50" cy="50" r="42" pathLength="100"/><circle class="fg" cx="50" cy="50" r="42" pathLength="100"/></svg>
+        <div class="val"><span data-count="{{ latest.percent }}" data-dec="0" data-suf="%">0%</span></div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="stat-row">
+      <a href="/s/leaderboard"><b>{% if latest and latest.rank %}#<span data-count="{{ latest.rank }}">{{ latest.rank }}</span>{% else %}—{% endif %}</b><span>{{ 'of ' ~ latest.class_size ~ ' in class' if latest else 'Class rank' }}</span></a>
+      <a href="/s/fees"><b data-count="{{ due_total }}" data-money>{{ due_total|money }}</b><span>{{ 'Fee balance' if due_total else 'All fees paid ✓' }}</span></a>
+      <a href="/s/courses"><b data-count="{{ subjects|length }}">{{ subjects|length }}</b><span>Subjects</span></a>
+    </div>
+  </section>
+
+  {% if next_due and next_due.status == 'Overdue' %}
+  <a class="card fee-card Overdue" href="/s/fees" style="color:inherit;text-decoration:none">
+    <span class="ic">⏰</span>
+    <div class="grow"><b>{{ next_due.title }} is overdue</b><div class="small muted">Was due {{ next_due.due_date|d }} · {{ next_due.outstanding|money }} left</div></div>
+    <span class="btn sm danger">Pay</span>
+  </a>
+  {% endif %}
+
+  <section>
+    <h2>📢 Notices</h2>
+    {% if notices %}
+    <div class="carousel">
+      {% for n in notices %}
+      <article class="card notice">
+        <div class="tag">{{ 'Class ' ~ n.standard if n.standard else 'Everyone' }} · {{ n.created_at|d }}</div>
+        <b style="display:block;margin:4px 0 2px">{{ n.title }}</b>
+        {% if n.body %}<div class="small muted">{{ n.body }}</div>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    <div class="dots"></div>
+    {% else %}<div class="card">{{ ui.empty('📭', 'No notices right now') }}</div>{% endif %}
+  </section>
+
+  <section>
+    <div class="spread"><h2>📚 Your subjects</h2><a class="small" href="/s/courses">See all →</a></div>
+    <div class="tiles">
+      {% for s in subjects[:6] %}
+      <a class="tile" href="/s/courses/{{ s.id }}" style="--c:{{ COLOURS.get(s.colour, '#4f46e5') }}">
+        <span class="ic">{{ s.icon }}</span><b>{{ s.name }}</b><span>Notes & practice</span></a>
+      {% else %}<div class="card">{{ ui.empty('📚', 'No subjects yet') }}</div>{% endfor %}
+    </div>
+  </section>
+
+  {% if latest %}
+  <section>
+    <h2>📊 {{ latest.exam.name }}</h2>
+    <div class="card">
+      {% for s in latest.subjects %}
+      <div class="subj-line">
+        <span class="subj-dot" style="--c:{{ s.colour }}">{{ s.icon }}</span>
+        <div><div class="spread small"><b>{{ s.name }}</b><span class="muted">{{ s.marks|num }}/{{ latest.exam.max_marks|num }}</span></div>
+          <div class="bar"><i style="--w:{{ s.percent }}%;--c:{{ ui.pct_colour(s.percent) }};--delay:{{ loop.index0 * 0.1 + 0.3 }}s"></i></div></div>
+        <b class="small">{{ s.percent|num }}%</b>
+      </div>
+      {% endfor %}
+      {% if previous %}
+        {% set diff = latest.percent - previous.percent %}
+        <p class="small" style="margin-bottom:0">{% if diff >= 0 %}<span class="trend-up">▲ {{ diff|num }}%</span>{% else %}<span class="trend-down">▼ {{ (-diff)|num }}%</span>{% endif %}
+          compared with {{ previous.exam.name }} · <a href="/s/results">All results →</a></p>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
