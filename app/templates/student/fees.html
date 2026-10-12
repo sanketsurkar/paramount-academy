@@ -1,0 +1,50 @@
+{% extends "student/_base.html" %}
+{% import "macros.html" as ui with context %}
+{% block content %}
+<div class="reveal">
+  <div class="page-head"><div><h1>Fees</h1><div class="sub">Pay by UPI and show the reference to the office</div></div></div>
+  <section class="card hero">
+    <div class="spread"><div class="muted small">{{ 'Balance this year' if due > 0 else 'All paid up 🎉' }}</div>
+      {% if due_now %}<span class="badge b-Overdue">{{ due_now|money }} overdue</span>{% endif %}</div>
+    <div style="font-size:2.1rem;font-weight:900;letter-spacing:-.02em" data-count="{{ due }}" data-money>{{ due|money }}</div>
+    {% if billed %}
+    <div class="bar lg" style="background:rgba(255,255,255,.2);margin-top:12px"><i style="--w:{{ (paid / billed * 100)|round(1) }}%;--c:#fbbf24"></i></div>
+    <div class="small muted" style="margin-top:6px">{{ paid|money }} paid of {{ billed|money }} this year</div>
+    {% endif %}
+    {% if due > 0 %}
+    <div class="row" style="margin-top:14px">
+      {% if upi_link %}<a class="btn amber" href="{{ upi_link }}" data-noprogress>⚡ Pay {{ pay_amount|money }} by UPI</a>{% endif %}
+      {% if settings.upi_id or settings.upi_qr %}<button class="btn" type="button" style="--b:rgba(255,255,255,.18)" data-open="qrSheet">▦ Show QR</button>{% endif %}
+    </div>
+    {% endif %}
+  </section>
+
+  <h2>Instalments</h2>
+  {% for f in items %}
+  <div class="card">
+    <div class="fee-card {{ f.status }}">
+      <span class="ic">{{ {'Paid': '✅', 'Overdue': '⏰', 'Partial': '◐', 'Due': '🗓️'}[f.status] }}</span>
+      <div class="grow"><b>{{ f.title }}</b><div class="small muted">Due {{ f.due_date|d }}{% if f.paid_amount and f.outstanding %} · {{ f.outstanding|money }} left{% endif %}</div></div>
+      <div class="right"><b>{{ f.amount|money }}</b><br><span class="badge b-{{ f.status }}">{{ f.status }}</span></div>
+    </div>
+    {% for p in f.payments %}
+      <a class="row small" href="/receipt/{{ p.id }}" style="margin-top:10px;padding:8px 10px;border-radius:12px;background:var(--surface-2);color:inherit;text-decoration:none">
+        🧾 <span class="grow">{{ p.amount|money }} · {{ p.paid_on|d }}</span><span style="color:var(--brand-2);font-weight:700">Receipt {{ p.receipt_no }} ›</span></a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card">{{ ui.empty('🧾', 'No fee records yet') }}</div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block dialogs %}
+{% call ui.sheet('qrSheet', 'Pay by UPI') %}
+<div class="center">
+  {% if settings.upi_qr %}<img class="qr" src="/upi-qr" alt="Academy UPI QR code">{% endif %}
+  <p class="small muted">Scan with GPay, PhonePe, Paytm or any UPI app</p>
+  {% if settings.upi_id %}<div class="copy"><code>{{ settings.upi_id }}</code><button class="btn sm soft" type="button" data-copy="{{ settings.upi_id }}">Copy</button></div>{% endif %}
+  <p class="small">Amount: <b>{{ pay_amount|money }}</b> · Add your ID <b>{{ user.login_id }}</b> in the note</p>
+  <p class="xs muted">After paying, share the UPI reference (UTR) with the office. Your receipt appears here once they record it.</p>
+</div>
+{% endcall %}
+{% endblock %}
