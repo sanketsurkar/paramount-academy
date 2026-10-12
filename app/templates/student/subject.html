@@ -1,0 +1,33 @@
+{% extends "student/_base.html" %}
+{% import "macros.html" as ui with context %}
+{% block content %}
+<div class="reveal">
+  <a href="/s/courses" class="small">← All subjects</a>
+  <section class="card subj-hero" style="--c:{{ colour }};margin-top:10px">
+    <div class="row"><span style="font-size:2.2rem">{{ subject.icon }}</span>
+      <div><h1 style="margin:0;color:#fff">{{ subject.name }}</h1>
+        <div class="small" style="opacity:.85">Class {{ subject.standard }} · {{ chapters|length }} chapter{{ '' if chapters|length == 1 else 's' }}</div></div></div>
+  </section>
+  {% for chapter, items in chapters.items() %}
+  <details class="acc" {{ 'open' if loop.first }}>
+    <summary><span class="subj-dot" style="--c:{{ colour }}">📑</span><span class="grow">{{ chapter }}<br><span class="xs muted">{{ items|length }} file{{ '' if items|length == 1 else 's' }}</span></span></summary>
+    <div class="acc-body">
+      {% for c in items %}
+      <div class="file">
+        <span class="fi {{ c.file_type }}">{{ c.file_type|upper }}</span>
+        <div class="grow"><b class="ellipsis" style="display:block">{{ c.title }}</b>
+          <span class="xs muted">{{ ((c.size_bytes / 1024)|round|int) }} KB · {{ c.created_at|d }}</span>
+          <div class="row" style="margin-top:8px;gap:6px">
+            <a class="btn sm" href="/files/{{ c.id }}" target="_blank" rel="noopener">{{ 'Open' if c.file_type == 'pdf' else 'Download' }}</a>
+            <button type="button" class="btn sm soft save-btn" data-save="/files/{{ c.id }}">⬇ Save offline</button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </details>
+  {% else %}
+  <div class="card">{{ ui.empty('🗂️', 'No notes yet', 'Your teachers haven\'t uploaded notes for ' ~ subject.name ~ ' yet.') }}</div>
+  {% endfor %}
+</div>
+{% endblock %}
