@@ -1,0 +1,44 @@
+{% extends "student/_base.html" %}
+{% import "macros.html" as ui with context %}
+{% block body_attrs %}{% if mine and mine[0] <= 3 %}data-confetti="{{ exam.id }}-{{ user.id }}"{% endif %}{% endblock %}
+{% block content %}
+<div class="reveal">
+  <div class="page-head"><div><h1>🏆 Class {{ user.student.standard }} leaderboard</h1>
+    {% if exam %}<div class="sub">{{ exam.name }} · {{ exam.exam_date|d }} · average % across subjects</div>{% endif %}</div></div>
+  {% if disabled %}
+    <div class="card">{{ ui.empty('🙈', 'Leaderboard is turned off', 'The academy has hidden rankings for now.') }}</div>
+  {% elif not exam %}
+    <div class="card">{{ ui.empty('⏳', 'No rankings yet', 'Rankings appear after your class results are published.') }}</div>
+  {% else %}
+    <div class="card">
+      <div class="podium">
+        {% for pos in [1, 0, 2] %}{% if podium|length > pos %}{% set r, st, score = podium[pos] %}
+        <div class="p p{{ pos + 1 }}{{ ' me' if st.id == user.student.id }}">
+          {% if pos == 0 %}<span class="crown">👑</span>{% endif %}
+          <div class="avatar">{{ st.user.name|initials }}</div>
+          <div class="who">{{ 'You' if st.id == user.student.id else st.user.name|short }}</div>
+          <div class="pct">{{ score|num }}%</div>
+          <div class="step">{{ r }}</div>
+        </div>
+        {% else %}<div></div>{% endif %}{% endfor %}
+      </div>
+      <div class="list-reveal">
+        {% for r, st, score in rest %}
+        <div class="lb-row{{ ' me' if st.id == user.student.id }}">
+          <span class="rank">{{ r }}</span><span class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:.78rem">{{ st.user.name|initials }}</span>
+          <span class="grow"><b>{{ 'You' if st.id == user.student.id else st.user.name|short }}</b></span><b>{{ score|num }}%</b>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% if mine %}
+    <div class="lb-row me me-pin card" style="margin-bottom:0">
+      <span class="rank" style="color:var(--brand-2)">#{{ mine[0] }}</span>
+      <span class="grow"><b>Your rank</b><br><span class="xs muted">out of {{ total }} students</span></span>
+      <b style="font-size:1.2rem">{{ mine[2]|num }}%</b>
+    </div>
+    {% if mine[0] <= 3 %}<p class="center small" style="margin-top:14px">🎉 Amazing — you're in the top 3!</p>{% endif %}
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
