@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.paramountsacademy.app",
+        "sha256_cert_fingerprints": ["39:5B:E7:D8:7E:2C:7B:D0:C6:05:A2:B2:04:D9:DC:A2:18:0B:A6:8C:5C:4B:CF:00:5A:5D:E3:47:02:AA:EF:33"]
+      }
+    }]
