@@ -1,0 +1,35 @@
+{% extends "student/_base.html" %}
+{% import "macros.html" as ui with context %}
+{% block content %}
+<div class="reveal">
+  <div class="page-head"><div><h1>Results & progress</h1><div class="sub">Tap an exam to see subject-wise marks</div></div></div>
+  {% if not progress %}
+    <div class="card">{{ ui.empty('📝', 'No results yet', 'Results appear here once your teacher publishes them.') }}</div>
+  {% else %}
+    {% if chart %}
+    <div class="card"><div class="card-title"><h3>📈 Your progress</h3><span class="badge b-info">{{ progress|length }} exams</span></div>{{ chart|safe }}</div>
+    {% endif %}
+    {% for p in progress %}
+    <details class="acc exam" {{ 'open' if loop.first }}>
+      <summary>
+        <span class="pct-pill" style="--pc:{{ ui.pct_colour(p.percent) }}">{{ p.percent|num }}%</span>
+        <span class="grow"><span style="display:block">{{ p.exam.name }}</span>
+          <span class="xs muted" style="font-weight:500">{{ p.exam.exam_date|d }} · Rank {{ p.rank }} of {{ p.class_size }}</span></span>
+      </summary>
+      <div class="acc-body">
+        {% for s in p.subjects %}
+        <div class="subj-line">
+          <span class="subj-dot" style="--c:{{ s.colour }}">{{ s.icon }}</span>
+          <div><div class="spread small"><b>{{ s.name }}</b><span class="muted">{{ s.marks|num }}/{{ p.exam.max_marks|num }}</span></div>
+            <div class="bar"><i style="--w:{{ s.percent }}%;--c:{{ ui.pct_colour(s.percent) }};--delay:{{ loop.index0 * 0.08 }}s"></i></div></div>
+          <b class="small">{{ s.percent|num }}%</b>
+        </div>
+        {% endfor %}
+        <div class="spread small" style="border-top:1px dashed var(--line);padding-top:10px"><b>Total</b><b>{{ p.total|num }} / {{ p.out_of|num }}</b></div>
+        {% if p.remark %}<div class="remark">💬 <b>Teacher's remark:</b> {{ p.remark }}</div>{% endif %}
+      </div>
+    </details>
+    {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}
