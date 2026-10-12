@@ -1,0 +1,29 @@
+{% extends "student/_base.html" %}
+{% block content %}
+<div class="reveal">
+  <section class="card hero center">
+    <div class="avatar lg on-hero" style="margin:0 auto 10px">{{ user.name|initials }}</div>
+    <h1 style="margin:0;color:#fff">{{ user.name }}</h1>
+    <div class="muted">{{ user.login_id }} · Class {{ st.standard }}</div>
+  </section>
+  <div class="card pad0">
+    <div class="item"><span>👨‍👩‍👧</span><span class="grow">Parent</span><b>{{ st.parent_name or '—' }}</b></div>
+    <div class="item"><span>📞</span><span class="grow">Parent phone</span><b>{{ st.parent_phone or '—' }}</b></div>
+    <div class="item"><span>📅</span><span class="grow">Joined</span><b>{{ st.joined_on|d }}</b></div>
+  </div>
+  <p class="xs muted center">To correct these details, contact the academy office.</p>
+  <div class="card pad0">
+    <a class="item" href="/change-password"><span>🔑</span><span class="grow">Change password</span><span class="chev">›</span></a>
+    <button class="item" type="button" data-theme-toggle data-label style="width:100%;background:none;border:0;font:inherit;color:inherit;cursor:pointer;justify-content:flex-start">🌙</button>
+  </div>
+  <div class="card">
+    <b>📲 Install as an app</b>
+    <p class="small muted">Chrome: tap ⋮ → <i>Add to Home screen</i>. iPhone Safari: Share → <i>Add to Home Screen</i>.</p>
+  </div>
+  <form method="post" action="/logout">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <button class="btn block danger">Sign out</button>
+  </form>
+  <p class="xs muted center">Signing out also removes saved offline pages from this phone.</p>
+</div>
+{% endblock %}
