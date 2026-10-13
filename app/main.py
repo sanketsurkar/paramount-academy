@@ -115,6 +115,14 @@ def manifest():
 def health():
     return {"status": "ok", "version": VERSION}
 
+@app.get("/.well-known/assetlinks.json", include_in_schema=False)
+def assetlinks():
+    """Links the Android app to this website (file comes from PWABuilder)."""
+    path = STATIC / "assetlinks.json"
+    if not path.exists():
+        raise HTTPException(404, "Not set up yet.")
+    return FileResponse(path, media_type="application/json")
+
 
 for module in (auth, student, staff, admin):
     app.include_router(module.router)
