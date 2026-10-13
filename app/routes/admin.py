@@ -410,7 +410,7 @@ async def settings_save(request: Request, user: User = Depends(admin_only), db: 
         else:
             db.add(Setting(key=key, value=value))
 
-    put("academy_name", str(form.get("academy_name", "")).strip()[:80] or "The Paramount Academy")
+    put("academy_name", str(form.get("academy_name", "")).strip()[:80] or "The Paramounts Academy")
     put("upi_id", str(form.get("upi_id", "")).strip()[:80])
     put("upi_payee", str(form.get("upi_payee", "")).strip()[:80])
     put("phone", str(form.get("phone", "")).strip()[:30])
