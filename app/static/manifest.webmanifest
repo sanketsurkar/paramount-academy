@@ -1,6 +1,6 @@
 {
-  "name": "The Paramount Academy",
-  "short_name": "Paramount",
+  "name": "The Paramounts Academy",
+  "short_name": "TPA",
   "description": "Courses, results, ranks and fees for Paramount Academy students.",
   "start_url": "/home",
   "scope": "/",
