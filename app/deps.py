@@ -14,9 +14,9 @@ from .models import Setting, User
 templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
 
 DEFAULT_SETTINGS = {
-    "academy_name": "The Paramount Academy",
+    "academy_name": "The Paramounts Academy",
     "upi_id": "",
-    "upi_payee": "The Paramount Academy",
+    "upi_payee": "The Paramounts Academy",
     "phone": "",
     "upi_qr": "",
     "leaderboard_enabled": "1",
