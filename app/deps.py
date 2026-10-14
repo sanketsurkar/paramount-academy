@@ -15,9 +15,9 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
 INDIA_TIMEZONE = timezone(timedelta(hours=5, minutes=30))
 
 DEFAULT_SETTINGS = {
-    "academy_name": "The Paramount Academy",
+    "academy_name": "The Paramounts Academy",
     "upi_id": "",
-    "upi_payee": "The Paramount Academy",
+    "upi_payee": "The Paramounts Academy",
     "phone": "",
     "upi_qr": "",
     "leaderboard_enabled": "1",
