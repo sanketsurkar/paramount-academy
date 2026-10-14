@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,6 +8,11 @@ from .db import Base
 
 def now() -> datetime:
     return datetime.now()
+
+
+def utc_now() -> datetime:
+    """Return UTC as a naive datetime for database columns without timezone support."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class User(Base):
@@ -183,5 +188,5 @@ class AuditLog(Base):
     user_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     action: Mapped[str] = mapped_column(String(60))
     detail: Mapped[str] = mapped_column(String(300), default="")
-    # created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+    # Store audit times in UTC; the activity-log display converts them to India Standard Time.
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
