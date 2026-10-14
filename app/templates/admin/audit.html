@@ -9,7 +9,7 @@
       <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Details</th></tr></thead>
       <tbody id="audit-rows">
       {% for a, name in rows %}
-        <tr><td class="nowrap small">{{ a.created_at.strftime('%d %b, %I:%M %p') }}</td><td class="small">{{ name or 'System' }}</td>
+        <tr><td class="nowrap small">{{ a.created_at|audit_time }}</td><td class="small">{{ name or 'System' }}</td>
           <td><span class="badge b-info">{{ a.action }}</span></td><td class="small">{{ a.detail }}</td></tr>
       {% endfor %}
       </tbody>
