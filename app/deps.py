@@ -1,6 +1,6 @@
 """Request helpers: current user, role checks, CSRF, flash messages, template rendering."""
 import secrets
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.templating import Jinja2Templates
@@ -12,11 +12,12 @@ from .db import get_db
 from .models import Setting, User
 
 templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
+INDIA_TIMEZONE = timezone(timedelta(hours=5, minutes=30))
 
 DEFAULT_SETTINGS = {
-    "academy_name": "The Paramounts Academy",
+    "academy_name": "The Paramount Academy",
     "upi_id": "",
-    "upi_payee": "The Paramounts Academy",
+    "upi_payee": "The Paramount Academy",
     "phone": "",
     "upi_qr": "",
     "leaderboard_enabled": "1",
@@ -51,6 +52,13 @@ def fmt_date(value) -> str:
     return value.strftime("%d %b %Y").lstrip("0")
 
 
+def fmt_audit_time(value: datetime) -> str:
+    """Format a UTC audit timestamp in India Standard Time."""
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(INDIA_TIMEZONE).strftime("%d %b, %I:%M %p")
+
+
 def short_name(name: str) -> str:
     parts = (name or "").split()
     return parts[0] if len(parts) < 2 else f"{parts[0]} {parts[-1][0]}."
@@ -61,7 +69,8 @@ def initials(name: str) -> str:
     return (parts[0][0] + (parts[-1][0] if len(parts) > 1 else "")).upper()
 
 
-templates.env.filters.update(money=inr, num=num, d=fmt_date, short=short_name, initials=initials)
+templates.env.filters.update(money=inr, num=num, d=fmt_date, audit_time=fmt_audit_time,
+                             short=short_name, initials=initials)
 templates.env.globals.update(COLOURS=SUBJECT_COLOURS, ICONS=SUBJECT_ICONS, STANDARDS=STANDARDS,
                              VERSION=VERSION, is_production=IS_PRODUCTION)
 
