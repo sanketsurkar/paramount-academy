@@ -1,7 +1,7 @@
 """Business rules: IDs, subjects, results & ranks, fees, import, promotion, charts."""
 import csv
 import io
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from html import escape
 
 from sqlalchemy import func, select
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from .config import DEFAULT_SUBJECTS, STANDARDS, SUBJECT_COLOURS, SUBJECT_ICONS
 from .models import (AuditLog, Content, Exam, ExamRemark, FeeInstalment, Payment, Result, Student,
-                     Subject, Teacher, TeacherStandard, User)
+                     Subject, Teacher, TeacherStandard, User, utc_now)
 from .security import hash_password, temp_password
 
 PAYMENT_METHODS = ["UPI", "Cash", "Cheque", "Bank"]
@@ -21,9 +21,9 @@ def audit(db: Session, user_id: int | None, action: str, detail: str = "", merge
     if merge_minutes:
         recent = db.scalar(select(AuditLog).where(
             AuditLog.user_id == user_id, AuditLog.action == action, AuditLog.detail == detail,
-            AuditLog.created_at >= datetime.now() - timedelta(minutes=merge_minutes)))
+            AuditLog.created_at >= utc_now() - timedelta(minutes=merge_minutes)))
         if recent:
-            recent.created_at = datetime.now()
+            recent.created_at = utc_now()
             return
     db.add(AuditLog(user_id=user_id, action=action, detail=detail[:300]))
 
